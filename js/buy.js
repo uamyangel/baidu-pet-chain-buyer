@@ -7,7 +7,7 @@ $(function(){
 
     setInterval(function(){
         Buyer.showAutoBuyPets();
-    }, 2000);
+    }, 800);
 
     Buyer.InitBuyModal();
 

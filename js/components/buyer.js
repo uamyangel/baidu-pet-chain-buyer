@@ -107,10 +107,10 @@ var Buyer = {
             data: JSON.stringify({
                 "pageNo":1,
                 "pageSize":20,
-                "querySortType":"AMOUNT_ASC",
+                "querySortType":"CREATETIME_DESC",
                 "petIds":[],
-                "lastAmount":null,
-                "lastRareDegree": buyRareDegree,
+                "lastAmount":1250,
+                "lastRareDegree": parseInt(buyRareDegree),
                 "requestId": new Date().getTime(),
                 "appId":1,
                 "tpl":""
@@ -144,42 +144,57 @@ var Buyer = {
     },
 
     showAutoBuyPets:function () {
-        for(var i = 0; i <= Buyer.DegreeConf.length - 1; i++){
-            var conf = Buyer.DegreeConf[i];
-            if(conf.autoBuy){
-                $.ajax({
-                    type: 'POST',
-                    url: Buyer.ApiUrl.QueryPetsOnSale,
-                    contentType : 'application/json',
-                    data: JSON.stringify({
-                        "pageNo":1,
-                        "pageSize":10,
-                        "querySortType":"AMOUNT_ASC",
-                        "petIds":[],
-                        "lastAmount":conf.autoBuy.buyAmount,
-                        "lastRareDegree": i,
-                        "requestId": new Date().getTime(),
-                        "appId":1,
-                        "tpl":""
-                    }),
-                    success:function(res){
-                        var petsOnSale = res.data.petsOnSale || [];
+        $.ajax({
+            type: 'POST',
+            url: Buyer.ApiUrl.QueryPetsOnSale,
+            contentType : 'application/json',
+            data: JSON.stringify({
+                "pageNo":1,
+                "pageSize":20,
+                "querySortType":"CREATETIME_DESC",
+                "petIds":[],
+                "lastAmount":null,
+                "lastRareDegree": null,
+                "requestId": new Date().getTime(),
+                "appId":1,
+                "tpl":""
+            }),
+            success:function(res){
+                var petsOnSale = res.data.petsOnSale || [];
 
-                        for (var i = 0; i <= petsOnSale.length - 1; i++) {
-                            var pet = petsOnSale[i];
-                            var degree = Buyer.DegreeConf[pet.rareDegree] || {desc:'未知',buyAmount:'5.00'};
+                var th = '';
 
-                            if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount)) {
-                                Buyer.TryToBuyChain[pet.id] = {
-                                    degree:degree,
-                                    pet:pet
-                                };
-                            }
-                        }
+                for (var i = 0; i <= petsOnSale.length - 1; i++) {
+                    var pet = petsOnSale[i];
+                    var degree = Buyer.DegreeConf[pet.rareDegree] || {desc:'未知',buyAmount:'5.00',autoBuy:false};
+                    if (degree.autoBuy && parseFloat(pet.amount) <= parseFloat(degree.buyAmount)) {
+                        Buyer.TryToBuyChain[pet.id] = {
+                            degree:degree,
+                            pet:pet
+                        };
+                        console.log(degree.desc + '（' + pet.id + '）:' + pet.amount);
+                        console.log('找到啦!!!即将自动购买！');
+                        Alert.Success("找到啦!!!即将自动购买[" + degree.desc + ':' + pet.amount + ']', 1);
                     }
-                });
+
+                    var needToBuyColor = '';
+                    if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount)) {
+                        needToBuyColor = 'red';
+                    }
+
+                    th += '<tr>\
+                        <td>' + i + '</td>\
+                        <td>' + pet.id + '</td>\
+                        <td>' + pet.petId + '</td>\
+                        <td>第' + pet.generation + '代</td>\
+                        <td>' + degree.desc + '</td>\
+                        <td><font color="' + needToBuyColor + '">' + pet.amount + '</font></td>\
+                    </tr>';
+                }
+
+                $("#petsOnSale tbody").html("").append(th);
             }
-        }
+        });
     },
 
     TryBuyPets:function() {

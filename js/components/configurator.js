@@ -113,6 +113,7 @@ var Configurator = {
         Alert.Success("保存成功！", 3);
     },
     consumeLogCaptcha: function(seed, code, src) {
+        Configurator.clearLogCaptcha();
         var captchas = Configurator.getLogCaptcha();
         captcha = captchas.shift();
         Utils.setStorage("logCaptcha", captchas);

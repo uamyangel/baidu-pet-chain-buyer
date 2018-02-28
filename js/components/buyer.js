@@ -123,6 +123,11 @@ var Buyer = {
                     var pet = petsOnSale[i];
                     var degree = Buyer.DegreeConf[pet.rareDegree] || {desc:'未知',buyAmount:'5.00'};
 
+                    var needToBuyColor = '';
+                    if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount)) {
+                        needToBuyColor = 'red';
+                    }
+
                     th += '<tr>\
                         <td>' + i + '</td>\
                         <td>' + pet.id + '</td>\
@@ -160,7 +165,6 @@ var Buyer = {
                     success:function(res){
                         var petsOnSale = res.data.petsOnSale || [];
 
-                        var th = '';
                         for (var i = 0; i <= petsOnSale.length - 1; i++) {
                             var pet = petsOnSale[i];
                             var degree = Buyer.DegreeConf[pet.rareDegree] || {desc:'未知',buyAmount:'5.00'};

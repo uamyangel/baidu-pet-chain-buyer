@@ -93,7 +93,7 @@ var Configurator = {
             var captcha = logCaptcha[i];
             var captchaTime = Date.parse(new Date(captcha.Time));
             var nowTime = Date.parse(new Date());
-            if ((nowTime - captchaTime) < 60000) {
+            if ((nowTime - captchaTime) < 55000) {
                 clearedCaptcha.push(captcha)
             }
         }

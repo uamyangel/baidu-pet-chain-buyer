@@ -7,26 +7,32 @@ var Configurator = {
         desc: '普通',
         buyAmount: 100,
         saleAmount: 0,
+        autoBuy:false,
     },{
         desc: '稀有',
         buyAmount: 100,
         saleAmount: 0,
+        autoBuy:false,
     },{
         desc: '卓越',
         buyAmount: 100,
         saleAmount: 0,
+        autoBuy:true,
     },{
         desc: '史诗',
         buyAmount: 100,
         saleAmount: 0,
+        autoBuy:true,
     },{
         desc: '神话',
         buyAmount: 100,
         saleAmount: 0,
+        autoBuy:false,
     },{
         desc: '传说',
         buyAmount: 100,
         saleAmount: 0,
+        autoBuy:false,
     }],
 	getDegreeConf : function() {
         return Utils.getStorage("degreeConf", true) || Configurator.defaultDegreeConf;
@@ -34,27 +40,45 @@ var Configurator = {
     displayDegreeConf : function() {
 		var degreeConf = Configurator.getDegreeConf();
         var th = '';
+        var td = '';
         $.each(degreeConf,function(k, v) {
             th += '<tr class="confItem">\
                     <td><span>' + v.desc + '</span> <input type="text" name="id" value="' + k + '" style="display:none;" /></td>\
                     <td><input type="text" name="buyAmount" value="' + v.buyAmount + '" class="editBox input-large" /></td>\
                 </tr>';
+
+            if(v.autoBuy){
+                td += '<label style="margin-right:10px;">\
+                    <input type="checkbox" name="buyRareDegree" value="' + k + '" checked="checked" /> ' + v.desc + '\
+                </label>';
+            }else{
+                td += '<label style="margin-right:10px;">\
+                    <input type="checkbox" name="buyRareDegree" value="' + k + '" /> ' + v.desc + '\
+                </label>';
+            }
+
         });
         $(th).appendTo($("#degreeConf"));
+
+        $(td).appendTo($("#autoBuyDegreeConf"));
     },
     saveDegreeConf : function() {
         $("#saveDegreeConf").click(function(){
 			var degreeConf = Configurator.getDegreeConf();
             var confItems = $("#degreeConf .confItem");
+            var autoBuyItems = $("#autoBuyDegreeConf").find("input[type=checkbox]");
             for (var i = confItems.length - 1; i >= 0; i--) {
                 var item = confItems[i];
+                var autoItem = autoBuyItems[i];
 
                 var id = $(item).find("input[name=id]").val();
                 var buyAmount = $(item).find("input[name=buyAmount]").val();
+                var autoBuy = autoItem.checked;
 
                 degreeConf[id].buyAmount = buyAmount;
+                degreeConf[id].autoBuy = autoBuy;
             }
-			
+
             Utils.setStorage("degreeConf", degreeConf);
             Alert.Success("保存成功！", 3);
         });

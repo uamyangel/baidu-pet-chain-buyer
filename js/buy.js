@@ -3,11 +3,13 @@
  */
 
 $(function(){
-    setInterval(function(){
-        Buyer.ShowPetsOnSale();
-    }, 2000);
+    Buyer.ShowPetsOnSale();
 
     Buyer.InitBuyModal();
+
+    setInterval(function(){
+        Buyer.showAutoBuyPets();
+    }, 5000);
 
     setInterval(function(){
         Buyer.TryBuyPets();

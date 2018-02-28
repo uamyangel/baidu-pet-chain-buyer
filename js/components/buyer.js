@@ -91,10 +91,15 @@ var Buyer = {
             Buyer.submitBuy();
         });
 
+        $("input[name=buyRareDegree]").click(function () {
+            Buyer.ShowPetsOnSale();
+        });
+
         Alert.Success("已开始后台扫描狗狗，有符合条件的狗狗会弹验证码输入框哦~", 5);
     },
 
     ShowPetsOnSale: function() {
+        var buyRareDegree = $("input[name=buyRareDegree]:checked").val();
         $.ajax({
             type: 'POST',
             url: Buyer.ApiUrl.QueryPetsOnSale,
@@ -102,10 +107,10 @@ var Buyer = {
             data: JSON.stringify({
                 "pageNo":1,
                 "pageSize":20,
-                "querySortType":"CREATETIME_DESC",
+                "querySortType":"AMOUNT_ASC",
                 "petIds":[],
                 "lastAmount":null,
-                "lastRareDegree":null,
+                "lastRareDegree": buyRareDegree,
                 "requestId": new Date().getTime(),
                 "appId":1,
                 "tpl":""
@@ -117,15 +122,6 @@ var Buyer = {
                 for (var i = 0; i <= petsOnSale.length - 1; i++) {
                     var pet = petsOnSale[i];
                     var degree = Buyer.DegreeConf[pet.rareDegree] || {desc:'未知',buyAmount:'5.00'};
-
-                    var needToBuyColor = '';
-                    if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount)) {
-                        Buyer.TryToBuyChain[pet.id] = {
-                            degree:degree,
-                            pet:pet
-                        };
-                        needToBuyColor = 'red';
-                    }
 
                     th += '<tr>\
                         <td>' + i + '</td>\
@@ -140,6 +136,46 @@ var Buyer = {
                 $("#petsOnSale tbody").html("").append(th);
             }
         });
+    },
+
+    showAutoBuyPets:function () {
+        for(var i = 0; i <= Buyer.DegreeConf.length - 1; i++){
+            var conf = Buyer.DegreeConf[i];
+            if(conf.autoBuy){
+                $.ajax({
+                    type: 'POST',
+                    url: Buyer.ApiUrl.QueryPetsOnSale,
+                    contentType : 'application/json',
+                    data: JSON.stringify({
+                        "pageNo":1,
+                        "pageSize":10,
+                        "querySortType":"AMOUNT_ASC",
+                        "petIds":[],
+                        "lastAmount":conf.autoBuy.buyAmount,
+                        "lastRareDegree": i,
+                        "requestId": new Date().getTime(),
+                        "appId":1,
+                        "tpl":""
+                    }),
+                    success:function(res){
+                        var petsOnSale = res.data.petsOnSale || [];
+
+                        var th = '';
+                        for (var i = 0; i <= petsOnSale.length - 1; i++) {
+                            var pet = petsOnSale[i];
+                            var degree = Buyer.DegreeConf[pet.rareDegree] || {desc:'未知',buyAmount:'5.00'};
+
+                            if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount)) {
+                                Buyer.TryToBuyChain[pet.id] = {
+                                    degree:degree,
+                                    pet:pet
+                                };
+                            }
+                        }
+                    }
+                });
+            }
+        }
     },
 
     TryBuyPets:function() {
@@ -190,6 +226,12 @@ var Buyer = {
 
         $('#buyModalCenter').on('shown.bs.modal', function () {
             $('#buyVerifyCode').focus();
+
+            //TODO
+            // 自动提交购买
+            if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount) && captcha != undefined) {
+                Buyer.submitBuy();
+            }
         }).on('hidden.bs.modal', function () {
             Buyer.stopBuyProcess();
         });

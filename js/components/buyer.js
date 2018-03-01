@@ -172,8 +172,7 @@ var Buyer = {
                             degree:degree,
                             pet:pet
                         };
-                        console.log(degree.desc + '（' + pet.id + '）:' + pet.amount);
-                        console.log('找到啦!!!即将自动购买！');
+                        console.log("找到啦!!!即将自动购买[" + degree.desc + '（' + pet.id + '）:' + pet.amount + ']');
                         Alert.Success("找到啦!!!即将自动购买[" + degree.desc + ':' + pet.amount + ']', 1);
                     }
 
@@ -245,12 +244,6 @@ var Buyer = {
 
         $('#buyModalCenter').on('shown.bs.modal', function () {
             $('#buyVerifyCode').focus();
-
-            //TODO
-            // 自动提交购买
-            if (parseFloat(pet.amount) <= parseFloat(degree.buyAmount) && captcha != undefined) {
-                Buyer.submitBuy();
-            }
         }).on('hidden.bs.modal', function () {
             Buyer.stopBuyProcess();
         });
@@ -329,8 +322,13 @@ var Buyer = {
             }),
             success:function(res2){
                 if (res2.errorNo == 0) {
-                    Alert.Success("抢到啦！！！！！", 3);
+                    Alert.Success("抢到啦！！！！！！！！！！！！！！！！！！！！！！！！！！！！", 10);
+                    console.log('抢到啦！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！');
                 } else {
+                    //验证码过期，如果还能扫描到，可重新购买
+                    if(res2.errorNo == 101){
+                        Buyer.TryedBuyMap[petId] = false;
+                    }
                     var msg = '没抢到：错误码[' + res2.errorNo + '],错误信息[' + res2.errorMsg + ']'
                     Alert.Error(msg, 3);
                     console.log(msg)

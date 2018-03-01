@@ -172,6 +172,7 @@ var Buyer = {
                             degree:degree,
                             pet:pet
                         };
+
                         console.log("找到啦!!!即将自动购买[" + degree.desc + '（' + pet.id + '）:' + pet.amount + ']');
                         Alert.Success("找到啦!!!即将自动购买[" + degree.desc + ':' + pet.amount + ']', 1);
                     }
@@ -323,7 +324,7 @@ var Buyer = {
             success:function(res2){
                 if (res2.errorNo == 0) {
                     Alert.Success("抢到啦！！！！！！！！！！！！！！！！！！！！！！！！！！！！", 10);
-                    console.log('抢到啦！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！');
+                    console.log('抢到啦！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！');
                 } else {
                     //验证码过期，如果还能扫描到，可重新购买
                     if(res2.errorNo == 101){
@@ -338,6 +339,7 @@ var Buyer = {
             },
             error:function(){
                 Alert.Error("接口出错啦！", 3);
+                console.log('接口出错啦------------------------------------------');
                 $('#buyModalCenter').modal('hide');
             }
         });

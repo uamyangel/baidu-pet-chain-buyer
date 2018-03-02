@@ -327,7 +327,7 @@ var Buyer = {
                     console.log('抢到啦！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！');
                 } else {
                     //验证码过期，如果还能扫描到，可重新购买
-                    if(res2.errorNo == 101){
+                    if(res2.errorNo == 100){
                         Buyer.TryedBuyMap[petId] = false;
                     }
                     var msg = '没抢到：错误码[' + res2.errorNo + '],错误信息[' + res2.errorMsg + ']'
